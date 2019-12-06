@@ -6,14 +6,12 @@ module.exports = app =>{
         const date = req.query.date ? req.query.date
             : moment().endOf('day').toDate()
 
-        console.log(req.user.id)
-
         app.db('tasks')
             .where({ userId: req.user.id })
             .where('estimateAt', '<=', date)
             .orderBy('estimateAt')
-            .then(tasks => req.json(tasks))
-            .catch(_=> res.status(500).json("ERRO GET"))
+            .then(tasks => res.json({ tasks }))
+            .catch(err=> res.status(500).json(err))
     }
 
     const save = (req, res) => {
@@ -48,6 +46,7 @@ module.exports = app =>{
         app.db('tasks')
             .where({ id: req.params.id, userId: req.user.id })
             .update({ doneAt })
+            .update({ desc: req.body.desc })
             .then(_=> res.status(204).send())
             .catch(err => res.status(400).json(err))
     }
